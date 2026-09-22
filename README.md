@@ -53,7 +53,11 @@ REVIEW=$(curl -s -X POST $B/v1/northwind/reviews -H "Authorization: Bearer $TOKE
 # 3. Send it. Watch http://localhost:1080 for the message.
 curl -s -X POST $B/v1/northwind/reviews/$REVIEW/submit -H "Authorization: Bearer $TOKEN" | jq .status
 
-# 4. Open the emailed link in a browser, or exchange it for a session by hand and approve.
+# 4. A producer can leave an internal note; a client reviewer can neither read nor write one.
+curl -s -X POST $B/v1/northwind/reviews/$REVIEW/notes -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' -d '{"body":"Budget is tight on this one.","isInternal":true}' | jq .isInternal
+
+# 5. Open the emailed link in a browser, or exchange it for a session by hand and approve.
 curl -s -c jar -X POST $B/auth/reviewer-session -H 'Content-Type: application/json' \
   -d "{\"reviewId\":\"$REVIEW\"}"
 curl -s -b jar -X POST $B/v1/northwind/reviews/$REVIEW/decision \

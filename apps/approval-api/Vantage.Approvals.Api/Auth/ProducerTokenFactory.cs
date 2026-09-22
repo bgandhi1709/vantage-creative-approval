@@ -7,6 +7,17 @@ using Vantage.Approvals.Api.Configuration;
 
 namespace Vantage.Approvals.Api.Auth;
 
+public static class ProducerRoles
+{
+    /// <summary>
+    /// Role carried by a producer token. The check is a role claim rather than "which scheme
+    /// authenticated this caller", because the JWT handler's identity reports its configured
+    /// authentication type, not the scheme name — a difference that is invisible in a hand-built
+    /// test principal and very visible in production.
+    /// </summary>
+    public const string Producer = "producer";
+}
+
 public interface IProducerTokenFactory
 {
     /// <summary>Mints a producer token, or returns null when the address is outside the allowed domain.</summary>
@@ -44,6 +55,7 @@ internal sealed class ProducerTokenFactory(IOptions<ProducerTokenOptions> option
                 new Claim(JwtRegisteredClaimNames.Sub, email),
                 new Claim(JwtRegisteredClaimNames.Email, email),
                 new Claim(ClaimTypes.Name, email),
+                new Claim(ClaimTypes.Role, ProducerRoles.Producer),
             ],
             notBefore: DateTime.UtcNow,
             expires: DateTime.UtcNow.AddMinutes(settings.LifetimeMinutes),

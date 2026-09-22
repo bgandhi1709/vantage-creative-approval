@@ -13,7 +13,8 @@ Understand, change the smallest thing that solves it, prove it, write down what 
 2. **Investigate** — read the code that runs, plus its configuration. Evidence over assumption.
 3. **Trace** — follow the whole path: SPA → `/api` → controller → service → repository → storage,
    plus blob, notification and upstream call.
-4. **Plan** — root cause over symptom. Name the validation command before editing anything.
+4. **Plan** — find the cause, not the symptom, and decide how you will prove the fix before you
+   type any of it.
 5. **Check in** before any of:
    - a route, request/response contract, or persisted shape changes
    - the submit or decision side-effect order changes (see `docs/adr/0001`)
@@ -22,9 +23,9 @@ Understand, change the smallest thing that solves it, prove it, write down what 
    - a dependency is added or upgraded
    - anything destructive: history rewrites, bulk deletes, deployments
 
-   Routine, reversible, in-scope edits need no gate.
+   Everything else — small, reversible, inside the task you were given — just do.
 6. **Implement** — the smallest reviewable slice.
-7. **Validate** — see the matrix below. Prove it works, not that it compiles.
+7. **Validate** — run the thing. A green build is not evidence that the behaviour changed.
 8. **Document** — update this file, `AGENTS.md`, or an ADR in the same change when behaviour,
    ownership, or a repeated rule moves.
 
@@ -75,7 +76,8 @@ az bicep build --file infra/container-apps/main.bicep --stdout > /dev/null
   the row it describes.
 - Enums are serialized by name at every boundary, and enum members are appended, never reordered.
 - The review page's locale comes from the route, never from the browser or the session.
-- `bffClient` treats 204 and an empty 200 as success and parses JSON only when there is a body.
+- A void call can answer 204 or 200 with nothing in it. `bffClient` reads both as success and
+  only parses a body it actually received.
 - Configuration is validated on start. A revision missing a setting must fail readiness, not its
   first request.
 - No secret is committed. The local stack's keys are throwaway strings for local use, and they are
@@ -83,7 +85,7 @@ az bicep build --file infra/container-apps/main.bicep --stdout > /dev/null
 
 ## Validation
 
-| Changed | Minimum | Broaden when |
+| Changed | Run at least | Also run when |
 | --- | --- | --- |
 | Portal or console | `npx tsc -b --noEmit`, `npm test`, `npm run build` | contracts, auth, or i18n change |
 | API | `dotnet build` plus a targeted `dotnet test --filter` | contracts, side-effect order, or auth change |
@@ -92,5 +94,5 @@ az bicep build --file infra/container-apps/main.bicep --stdout > /dev/null
 | Bicep | `az bicep build` on the template *and* every parameter file | a parameter is added or renamed |
 | Docs only | read for stale links and claims | — |
 
-When a command fails, say whether the failure is pre-existing or introduced, give the exact
-command, and say what still passed.
+Report failures honestly: quote the command, say whether it was already failing before your
+change, and list what did pass.

@@ -66,10 +66,5 @@ public sealed class ReviewNotesController(IReviewNoteRepository notes, TimeProvi
         return this.Ok(note);
     }
 
-    private bool IsProducer() =>
-        string.Equals(
-            this.User.Identity?.AuthenticationType,
-            JwtBearerDefaults.AuthenticationScheme,
-            StringComparison.Ordinal
-        );
+    private bool IsProducer() => this.User.IsInRole(ProducerRoles.Producer);
 }

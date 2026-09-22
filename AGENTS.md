@@ -89,7 +89,7 @@ requests as well as `main`.
 
 ## Known gaps
 
-| Gap | Why it is acceptable here | What it would take |
+| Not built | Why that is fine for this system | The work it would take |
 | --- | --- | --- |
 | No optimistic concurrency on the review row | One producer edits a round at a time | ETag round-tripping through the repository contract |
 | Notes have no pagination | A round collects a handful of notes | Continuation tokens through `IReviewNoteRepository` |
@@ -97,4 +97,5 @@ requests as well as `main`.
 | No end-to-end browser test | The walkthrough in the README is manual | Playwright against the Compose stack in CI |
 | Asset previews are paths, not files | Keeps the demo free of binary handling | Blob upload plus SAS-scoped reads |
 
-Add to this table rather than leaving a gap undocumented; an unlisted gap reads as an oversight.
+If you find something missing that is not in this table, add it. Anything left unwritten reads
+to the next person as something nobody noticed.
