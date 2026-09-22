@@ -1,0 +1,36 @@
+# syntax=docker/dockerfile:1
+
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+
+# Restore against the manifests only, so a source-only change does not invalidate the package layer.
+COPY global.json NuGet.config Directory.Build.props Directory.Packages.props ./
+COPY libs/approval-core/Vantage.Approvals.Core/Vantage.Approvals.Core.csproj libs/approval-core/Vantage.Approvals.Core/
+COPY libs/approval-core/Vantage.Approvals.Repository/Vantage.Approvals.Repository.csproj libs/approval-core/Vantage.Approvals.Repository/
+COPY apps/approval-api/Vantage.Approvals.Api/Vantage.Approvals.Api.csproj apps/approval-api/Vantage.Approvals.Api/
+RUN dotnet restore apps/approval-api/Vantage.Approvals.Api/Vantage.Approvals.Api.csproj
+
+COPY libs/ libs/
+COPY apps/approval-api/ apps/approval-api/
+RUN dotnet publish apps/approval-api/Vantage.Approvals.Api/Vantage.Approvals.Api.csproj \
+    -c Release -o /app/publish --no-restore
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/publish .
+
+ENV ASPNETCORE_URLS=http://+:8080
+EXPOSE 8080
+
+# Build metadata, so a running container can be traced back to the commit that produced it.
+ARG SOURCE_REVISION=unknown
+ARG IMAGE_VERSION=0.0.0
+LABEL org.opencontainers.image.title="vantage-approvals-api" \
+      org.opencontainers.image.description="Creative approval API and orchestration" \
+      org.opencontainers.image.source="https://github.com/bg199117/vantage-creative-approval" \
+      org.opencontainers.image.revision="${SOURCE_REVISION}" \
+      org.opencontainers.image.version="${IMAGE_VERSION}" \
+      org.opencontainers.image.licenses="MIT"
+
+USER $APP_UID
+ENTRYPOINT ["dotnet", "Vantage.Approvals.Api.dll"]

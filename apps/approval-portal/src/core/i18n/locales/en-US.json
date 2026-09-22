@@ -1,0 +1,30 @@
+{
+  "review": {
+    "title": "Review round {{version}}",
+    "campaign": "Campaign",
+    "status": "Status",
+    "sent": "Sent",
+    "assets": "Assets in this round",
+    "approve": "Approve this round",
+    "requestChanges": "Request changes",
+    "commentLabel": "What needs to change?",
+    "commentPlaceholder": "Tell the team what to adjust",
+    "submitting": "Sending your answer…",
+    "decisionRecorded": "Thank you — your answer has been recorded.",
+    "loadFailed": "This review could not be loaded.",
+    "notes": "Notes",
+    "addNote": "Add a note",
+    "noNotes": "No notes yet."
+  },
+  "status": {
+    "Draft": "Draft",
+    "AwaitingDecision": "Awaiting your decision",
+    "ChangesRequested": "Changes requested",
+    "Approved": "Approved",
+    "Cancelled": "Cancelled"
+  },
+  "common": {
+    "retry": "Try again",
+    "loading": "Loading…"
+  }
+}

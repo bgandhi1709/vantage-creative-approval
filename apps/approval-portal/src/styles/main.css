@@ -1,0 +1,225 @@
+/*
+  One small stylesheet, written for this project. Tokens first, then layout, then components.
+*/
+
+:root {
+  --ink: #16181d;
+  --ink-muted: #5c6270;
+  --paper: #ffffff;
+  --surface: #f5f6f8;
+  --line: #d9dce3;
+  --accent: #2f5bd7;
+  --accent-ink: #ffffff;
+  --danger: #a8332b;
+  --radius: 10px;
+  --space: 16px;
+  --font: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #edeff3;
+    --ink-muted: #a2a9b8;
+    --paper: #16181d;
+    --surface: #1e2128;
+    --line: #313641;
+    --accent: #7ea1ff;
+    --accent-ink: #10131a;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  color: var(--ink);
+  background: var(--surface);
+  line-height: 1.5;
+}
+
+.shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.shell__header,
+.shell__footer {
+  padding: var(--space);
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+}
+
+.shell__footer {
+  border-bottom: none;
+  border-top: 1px solid var(--line);
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+}
+
+.shell__brand {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.shell__main {
+  flex: 1;
+  width: min(760px, 100% - 32px);
+  margin-inline: auto;
+  padding-block: calc(var(--space) * 2);
+}
+
+.review__eyebrow {
+  margin: 0;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+}
+
+.review h1 {
+  margin: 4px 0 var(--space);
+  font-size: 1.75rem;
+}
+
+.review__meta {
+  display: flex;
+  gap: calc(var(--space) * 2);
+  margin: 0 0 calc(var(--space) * 1.5);
+}
+
+.review__meta dt {
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.review__meta dd {
+  margin: 2px 0 0;
+  font-weight: 500;
+}
+
+.assets,
+.decision,
+.console {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--space);
+  margin-bottom: var(--space);
+}
+
+.assets h2 {
+  margin-top: 0;
+  font-size: 1rem;
+}
+
+.assets__list,
+.console__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.assets__item,
+.console__item {
+  display: flex;
+  gap: var(--space);
+  align-items: center;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+
+.assets__item:first-child,
+.console__item:first-child {
+  border-top: none;
+}
+
+.assets__format,
+.console__version,
+.console__status {
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+}
+
+.decision__label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.decision__comment,
+.console input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+}
+
+.decision__actions {
+  display: flex;
+  gap: 10px;
+  margin-top: var(--space);
+  flex-wrap: wrap;
+}
+
+.button {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.button--primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.state {
+  color: var(--ink-muted);
+}
+
+.state--error {
+  color: var(--danger);
+}
+
+.console__header {
+  display: flex;
+  gap: var(--space);
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: var(--space);
+}
+
+.console__header h1 {
+  margin: 0;
+  font-size: 1.25rem;
+  flex: 1 1 auto;
+}
+
+.console__user {
+  color: var(--ink-muted);
+  margin: 0;
+}
+
+.console--signin {
+  width: min(420px, 100%);
+  margin-inline: auto;
+  margin-top: 10vh;
+}

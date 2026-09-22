@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Vantage.Approvals.Api.Tests</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Moq" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Vantage.Approvals.Api\Vantage.Approvals.Api.csproj" />
+    <ProjectReference Include="..\..\..\libs\approval-core\Vantage.Approvals.Core\Vantage.Approvals.Core.csproj" />
+    <ProjectReference Include="..\..\..\libs\approval-core\Vantage.Approvals.Repository\Vantage.Approvals.Repository.csproj" />
+  </ItemGroup>
+
+</Project>

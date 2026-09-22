@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <RootNamespace>Vantage.Approvals.Api</RootNamespace>
+    <UserSecretsId>vantage-approvals-api</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Asp.Versioning.Mvc" />
+    <PackageReference Include="Azure.Storage.Blobs" />
+    <PackageReference Include="MailKit" />
+    <PackageReference Include="Mapster" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Microsoft.Extensions.Http.Polly" />
+    <PackageReference Include="Microsoft.OpenApi" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\libs\approval-core\Vantage.Approvals.Core\Vantage.Approvals.Core.csproj" />
+    <ProjectReference Include="..\..\..\libs\approval-core\Vantage.Approvals.Repository\Vantage.Approvals.Repository.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Vantage.Approvals.Api.Tests" />
+  </ItemGroup>
+
+</Project>

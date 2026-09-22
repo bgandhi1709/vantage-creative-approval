@@ -1,0 +1,30 @@
+{
+  "review": {
+    "title": "Korrekturrunde {{version}}",
+    "campaign": "Kampagne",
+    "status": "Status",
+    "sent": "Gesendet",
+    "assets": "Motive in dieser Runde",
+    "approve": "Runde freigeben",
+    "requestChanges": "Änderungen anfordern",
+    "commentLabel": "Was soll geändert werden?",
+    "commentPlaceholder": "Beschreiben Sie die gewünschten Änderungen",
+    "submitting": "Antwort wird gesendet…",
+    "decisionRecorded": "Vielen Dank — Ihre Antwort wurde erfasst.",
+    "loadFailed": "Diese Korrekturrunde konnte nicht geladen werden.",
+    "notes": "Anmerkungen",
+    "addNote": "Anmerkung hinzufügen",
+    "noNotes": "Noch keine Anmerkungen."
+  },
+  "status": {
+    "Draft": "Entwurf",
+    "AwaitingDecision": "Wartet auf Ihre Entscheidung",
+    "ChangesRequested": "Änderungen angefordert",
+    "Approved": "Freigegeben",
+    "Cancelled": "Abgebrochen"
+  },
+  "common": {
+    "retry": "Erneut versuchen",
+    "loading": "Wird geladen…"
+  }
+}

@@ -1,0 +1,48 @@
+# Serves the SPA and forwards /api to the API container.
+#
+# The two map blocks below are the interesting part. The API builds absolute review links from the
+# incoming request, so it has to see the scheme and host the *browser* used. When an edge proxy is
+# in front of us it already set X-Forwarded-Proto and X-Forwarded-Host, and overwriting them here
+# would replace the public hostname with this container's own. When nothing is in front, those
+# headers are absent and we have to supply them. Each map keeps the inbound value when there is
+# one and falls back to the local hop when there is not.
+
+map $http_x_forwarded_proto $forwarded_proto {
+    default $http_x_forwarded_proto;
+    ''      $scheme;
+}
+
+map $http_x_forwarded_host $forwarded_host {
+    default $http_x_forwarded_host;
+    ''      $http_host;
+}
+
+server {
+    listen 8081;
+    server_name _;
+    root /usr/share/nginx/html;
+
+    # Container probe. Deliberately not /health, which belongs to the API.
+    location = /healthz {
+        access_log off;
+        default_type text/plain;
+        return 200 "ok\n";
+    }
+
+    location /api/ {
+        # Same rewrite as the Vite dev proxy: the SPA always calls /api, the API never sees it.
+        rewrite ^/api/(.*)$ /$1 break;
+        proxy_pass ${API_UPSTREAM};
+        proxy_http_version 1.1;
+
+        proxy_set_header Host $forwarded_host;
+        proxy_set_header X-Forwarded-Proto $forwarded_proto;
+        proxy_set_header X-Forwarded-Host $forwarded_host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    # Client-side routing: every unknown path is the SPA's problem, not a 404 here.
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}

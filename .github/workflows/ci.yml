@@ -1,0 +1,103 @@
+name: ci
+
+# Pull requests are validated, not just main: a build that only runs after merge tells you about a
+# break when it is already everyone's problem.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  api:
+    name: API and storage library
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+
+      # The repository tests run against a real table emulator rather than a fake, so CI has to
+      # provide one. Without this step they would be the tests that only ever pass locally.
+      - name: Install Azurite
+        run: npm install -g azurite@3
+
+      - name: Build
+        run: dotnet build VantageApprovals.slnx -c Release
+
+      - name: Test
+        run: dotnet test VantageApprovals.slnx -c Release --no-build --logger "trx;LogFileName=api.trx"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-test-results
+          path: '**/*.trx'
+          if-no-files-found: ignore
+
+  portal:
+    name: Portal
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/approval-portal
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: apps/approval-portal/package-lock.json
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npx tsc -b --noEmit
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+  infrastructure:
+    name: Infrastructure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      # Every parameter file is compiled too, not just the template: a parameter file that no
+      # longer matches the template is the failure that only shows up at deploy time.
+      - name: Compile Bicep
+        run: |
+          az bicep install
+          az bicep build --file infra/container-apps/main.bicep --stdout > /dev/null
+          for file in infra/container-apps/params/*.bicepparam; do
+            az bicep build-params --file "$file" --stdout > /dev/null
+          done
+
+  security:
+    name: Dependency and filesystem scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Trivy filesystem scan
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: '1'

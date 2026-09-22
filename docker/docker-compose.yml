@@ -1,0 +1,77 @@
+name: vantage-creative-approval
+
+services:
+  # Table and blob storage. The API resolves its storage clients at start-up, so this has to be
+  # healthy before the API is useful.
+  storage:
+    image: mcr.microsoft.com/azure-storage/azurite:latest
+    command: azurite --blobHost 0.0.0.0 --tableHost 0.0.0.0 --queueHost 0.0.0.0 --skipApiVersionCheck
+    ports:
+      - '10000:10000'
+      - '10002:10002'
+    volumes:
+      - storage-data:/data
+
+  # Catches every outgoing review notification. Open http://localhost:1080 to read them.
+  mail:
+    image: maildev/maildev:2.2.1
+    environment:
+      MAILDEV_SMTP_PORT: '1025'
+      MAILDEV_WEB_PORT: '1080'
+    ports:
+      - '1080:1080'
+
+  # Stands in for the upstream campaign system. It answers the two calls the API makes, which is
+  # enough to exercise the idempotent stage transition without pulling in a second real service.
+  campaign-system:
+    image: nginx:1.29-alpine
+    volumes:
+      - ./stubs/campaign-system.conf:/etc/nginx/conf.d/default.conf:ro
+
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__ApprovalTableStorage: >-
+        DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://storage:10002/devstoreaccount1;
+      Snapshots__ConnectionString: >-
+        DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://storage:10000/devstoreaccount1;
+      Snapshots__ContainerName: review-snapshots
+      Notifications__SmtpHost: mail
+      Notifications__SmtpPort: '1025'
+      Notifications__FromAddress: reviews@vantage.test
+      Notifications__FromName: Vantage Works
+      ProducerToken__Issuer: vantage-approvals-api
+      ProducerToken__Audience: vantage-producer-console
+      ProducerToken__SigningKey: local-development-producer-signing-key
+      ProducerToken__AllowedEmailDomain: vantage.test
+      ReviewerSession__SigningKey: local-development-reviewer-signing-key
+      ReviewerSession__CookieName: vw_review
+      CampaignSystem__BaseUrl: http://campaign-system
+      CampaignSystem__ApiKey: local-development-campaign-key
+    ports:
+      # The portal joins this container's network namespace, so both ports are published here.
+      - '8080:8080'
+      - '8081:8081'
+    depends_on:
+      - storage
+      - mail
+      - campaign-system
+
+  portal:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.portal
+    # This is the point of the local stack: the portal container shares the API container's network
+    # namespace, so nginx reaches the API over real loopback exactly as the two-container
+    # deployment does. Testing the proxy hop over a bridge network would test a different thing.
+    network_mode: 'service:api'
+    environment:
+      API_UPSTREAM: http://127.0.0.1:8080
+    depends_on:
+      - api
+
+volumes:
+  storage-data:

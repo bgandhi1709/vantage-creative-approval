@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Service models and repository contracts only. This project deliberately has no storage,
+    HTTP or hosting dependency: the API talks to these interfaces, and Vantage.Approvals.Repository
+    is the only assembly that knows they are backed by Azure Table Storage.
+  -->
+  <PropertyGroup>
+    <RootNamespace>Vantage.Approvals.Core</RootNamespace>
+  </PropertyGroup>
+
+</Project>

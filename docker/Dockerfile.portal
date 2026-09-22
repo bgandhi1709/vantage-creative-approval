@@ -1,0 +1,34 @@
+# syntax=docker/dockerfile:1
+
+FROM node:22-alpine AS build
+WORKDIR /src
+
+COPY apps/approval-portal/package.json apps/approval-portal/package-lock.json ./
+RUN npm ci --no-audit --no-fund
+
+COPY apps/approval-portal/ ./
+RUN npm run build
+
+FROM nginx:1.29-alpine AS runtime
+
+# The alpine base is pinned to a minor tag rather than :alpine so a rebuild cannot silently pick up
+# a different nginx line; apk upgrade picks up security patches within it at build time.
+RUN apk upgrade --no-cache
+
+COPY --from=build /src/dist /usr/share/nginx/html
+COPY docker/nginx/default.conf.template /etc/nginx/templates/default.conf.template
+
+# Where nginx forwards /api. In the local stack and in the two-container deployment this is
+# loopback, because the portal container shares the API container's network namespace.
+ENV API_UPSTREAM=http://127.0.0.1:8080
+
+EXPOSE 8081
+
+ARG SOURCE_REVISION=unknown
+ARG IMAGE_VERSION=0.0.0
+LABEL org.opencontainers.image.title="vantage-approvals-portal" \
+      org.opencontainers.image.description="Creative approval SPA and its reverse proxy" \
+      org.opencontainers.image.source="https://github.com/bg199117/vantage-creative-approval" \
+      org.opencontainers.image.revision="${SOURCE_REVISION}" \
+      org.opencontainers.image.version="${IMAGE_VERSION}" \
+      org.opencontainers.image.licenses="MIT"

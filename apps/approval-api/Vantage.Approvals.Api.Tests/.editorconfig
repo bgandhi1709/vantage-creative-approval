@@ -1,0 +1,7 @@
+[*.cs]
+
+# Test names follow Method_Scenario_Expected so the failure contract reads off a test run.
+dotnet_diagnostic.CA1707.severity = none
+
+# xUnit collection definitions are named after the collection they define.
+dotnet_diagnostic.CA1711.severity = none

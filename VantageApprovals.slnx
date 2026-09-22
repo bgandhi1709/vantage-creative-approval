@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/apps/" />
+  <Folder Name="/apps/approval-api/">
+    <Project Path="apps/approval-api/Vantage.Approvals.Api.Tests/Vantage.Approvals.Api.Tests.csproj" />
+    <Project Path="apps/approval-api/Vantage.Approvals.Api/Vantage.Approvals.Api.csproj" />
+  </Folder>
+  <Folder Name="/libs/" />
+  <Folder Name="/libs/approval-core/">
+    <Project Path="libs/approval-core/Vantage.Approvals.Core/Vantage.Approvals.Core.csproj" />
+    <Project Path="libs/approval-core/Vantage.Approvals.Repository/Vantage.Approvals.Repository.csproj" />
+  </Folder>
+</Solution>
